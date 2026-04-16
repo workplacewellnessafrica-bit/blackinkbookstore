@@ -33,7 +33,8 @@ export async function initiateSTKPush(phone: string, amount: number, orderId: st
 
   const formattedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone.replace('+', '')
 
-  const host = process.env.NEXTAUTH_URL || 'https://blackinkbookstore-swart.vercel.app'
+  const rawHost = process.env.NEXTAUTH_URL || 'https://blackinkbookstore-swart.vercel.app'
+  const host = rawHost.endsWith('/') ? rawHost.slice(0, -1) : rawHost
 
   const payload = {
     BusinessShortCode: shortcode,
@@ -45,7 +46,7 @@ export async function initiateSTKPush(phone: string, amount: number, orderId: st
     PartyB: shortcode,
     PhoneNumber: formattedPhone,
     CallBackURL: `${host}/api/webhooks/mpesa`,
-    AccountReference: orderId.slice(0, 12), // Safaricom limit
+    AccountReference: orderId.slice(0, 12),
     TransactionDesc: "Blackink Bookstore Checkout"
   }
 
