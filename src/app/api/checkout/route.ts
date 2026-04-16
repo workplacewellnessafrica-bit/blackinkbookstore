@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { initiateSTKPush } from '@/lib/mpesa'
 import { z } from 'zod'
 
 const checkoutSchema = z.object({
@@ -73,6 +74,19 @@ export async function POST(request: Request) {
 
     // Mock sending email via Resend
     console.log(`[Resend Mock Task] Sending receipt to ${order.customerEmail} for order ${order.id}`);
+
+    // Dispatch Daraja STK 
+    if (order.paymentMethod === 'MPESA') {
+      if (!data.customerPhone) {
+        return NextResponse.json({ error: 'Phone number is strictly required for M-PESA checkout.' }, { status: 400 })
+      }
+      try {
+        await initiateSTKPush(data.customerPhone, total, order.id)
+      } catch (mpesaError: any) {
+        console.error('STK Push Initializer Blocked:', mpesaError)
+        return NextResponse.json({ error: 'Order created, but STK failed: ' + mpesaError.message }, { status: 400 })
+      }
+    }
 
     return NextResponse.json({ success: true, orderId: order.id })
 
