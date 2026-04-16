@@ -14,7 +14,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
     <div className="min-h-screen flex bg-[#FAFAF9]">
       <aside className="w-64 border-r border-border bg-white flex flex-col flex-shrink-0">
         <div className="h-16 flex items-center px-6 border-b border-border text-text">
-          <Link href="/" className="font-bold text-xl tracking-tighter text-text hover:opacity-80">BLACKINK.</Link>
+          <Link href="/" className="font-bold text-xl tracking-tighter text-text hover:opacity-80">BLACKINK BOOKSTORE.</Link>
           <span className="ml-2 text-xs font-semibold bg-black/5 px-2 py-1 rounded">CMS</span>
         </div>
         <nav className="flex-1 p-4 space-y-1 text-sm font-medium">

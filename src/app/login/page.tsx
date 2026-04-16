@@ -35,7 +35,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-lg border border-border shadow-sm">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold tracking-tighter text-text">BLACKINK.</Link>
+          <Link href="/" className="text-3xl font-bold tracking-tighter text-text">BLACKINK BOOKSTORE.</Link>
           <p className="text-muted mt-2">Owner Portal Authentication</p>
         </div>
         

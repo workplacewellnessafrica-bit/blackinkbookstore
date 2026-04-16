@@ -17,7 +17,7 @@ export function NavBar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur">
       <div className="container mx-auto max-w-6xl px-4 h-16 flex items-center justify-between">
         <Link href="/" className="font-sans font-bold text-2xl tracking-tighter text-text">
-          BLACKINK.
+          BLACKINK BOOKSTORE.
         </Link>
         <nav className="flex items-center gap-6">
           <Link href="/books" className="text-sm font-medium text-muted hover:text-text transition-colors">
