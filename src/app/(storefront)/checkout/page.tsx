@@ -121,13 +121,14 @@ export default function CheckoutPage() {
                 </div>
                 
                 {/* Tier 1: Select Region */}
-                <div>
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-widest font-bold text-muted">Step 1: Region</label>
                   <select 
                     {...register('shippingRegion')}
-                    className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
+                    className="flex h-12 w-full rounded-md border border-border bg-background px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent font-medium shadow-sm"
                   >
-                    <option value="">Select Destination Region</option>
-                    {uniqueLocations.map(location => (
+                    <option value="">Select your city or region</option>
+                    {uniqueLocations.sort().map(location => (
                       <option key={location} value={location}>{location}</option>
                     ))}
                   </select>
@@ -135,19 +136,28 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Tier 2: Select Provider depending on Region */}
-                {selectedRegionName && availableProviders.length > 0 && (
-                  <div className="p-4 bg-black/5 rounded-md space-y-3">
-                    <p className="font-semibold text-sm">Select Default Carrier for {selectedRegionName}</p>
+                {selectedRegionName && (
+                  <div className="pt-4 space-y-4">
+                    <label className="text-xs uppercase tracking-widest font-bold text-muted">Step 2: Choose Delivery Partner</label>
                     <div className="grid gap-3">
-                      {availableProviders.map(providerZone => (
-                         <label key={providerZone.id} className="flex items-center gap-3 cursor-pointer p-3 border border-border rounded bg-white hover:border-black transition-colors">
-                           <input type="radio" value={providerZone.provider} {...register('shippingProvider')} className="accent-text" />
-                           <div className="flex-1 flex justify-between">
-                              <span className="font-semibold text-sm">{providerZone.provider}</span>
-                              <span className="font-mono font-medium text-sm">+ KES {providerZone.fee}</span>
-                           </div>
-                         </label>
-                      ))}
+                      {availableProviders.length > 0 ? (
+                        availableProviders.map(providerZone => (
+                           <label key={providerZone.id} className={`flex items-center gap-4 cursor-pointer p-5 border rounded-xl transition-all duration-300 ${watch('shippingProvider') === providerZone.provider ? 'border-black bg-black/5 ring-1 ring-black shadow-md' : 'border-border bg-white hover:border-black/50 hover:bg-black/[0.02]'}`}>
+                             <input type="radio" value={providerZone.provider} {...register('shippingProvider')} className="accent-black h-4 w-4" />
+                             <div className="flex-1 flex justify-between items-center">
+                                <div>
+                                  <span className="block font-bold text-base text-text">{providerZone.provider}</span>
+                                  <span className="text-[10px] uppercase tracking-wider text-muted font-bold">Reliable Express Delivery</span>
+                                </div>
+                                <div className="text-right">
+                                  <span className="font-mono font-bold text-lg text-text">KES {providerZone.fee}</span>
+                                </div>
+                             </div>
+                           </label>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted italic p-4 border border-dashed border-border rounded-md text-center">We currently have no active carriers for this region. Please try another location.</p>
+                      )}
                     </div>
                     {errors.shippingProvider && <p className="text-error text-xs mt-1">Please select an available fulfillment carrier.</p>}
                   </div>
