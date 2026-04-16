@@ -33,19 +33,25 @@ export async function initiateSTKPush(phone: string, amount: number, orderId: st
 
   const formattedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone.replace('+', '')
 
-  const rawHost = process.env.NEXTAUTH_URL || 'https://blackinkbookstore-swart.vercel.app'
-  const host = rawHost.endsWith('/') ? rawHost.slice(0, -1) : rawHost
+  let rawHost = process.env.NEXTAUTH_URL || 'https://blackinkbookstore-swart.vercel.app'
+  
+  // Guarantee protocol and remove trailing slashes
+  if (!rawHost.startsWith('http')) rawHost = `https://${rawHost}`
+  const host = rawHost.replace(/\/$/, '') 
+
+  const CallBackURL = `${host}/api/webhooks/mpesa`
+  console.log('Final M-Pesa CallBackURL being sent to Daraja:', CallBackURL)
 
   const payload = {
     BusinessShortCode: shortcode,
     Password: password,
     Timestamp: timestamp,
-    TransactionType: isProd ? "CustomerPayBillOnline" : "CustomerPayBillOnline", 
+    TransactionType: "CustomerPayBillOnline", 
     Amount: Math.ceil(amount),
     PartyA: formattedPhone,
     PartyB: shortcode,
     PhoneNumber: formattedPhone,
-    CallBackURL: `${host}/api/webhooks/mpesa`,
+    CallBackURL: CallBackURL,
     AccountReference: orderId.slice(0, 12),
     TransactionDesc: "Blackink Bookstore Checkout"
   }
