@@ -1,9 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #FAFAF9;
+  --color-text: #0A0A0A;
+  --color-muted: #6B6B6B;
+  --color-border: #E5E5E5;
+  --color-accent: #0A0A0A;
+  --color-error: #DC2626;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
 
 @layer base {
   body {
-    @apply bg-background text-text font-sans antialiased;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
 }
