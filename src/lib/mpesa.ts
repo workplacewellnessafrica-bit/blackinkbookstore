@@ -1,11 +1,14 @@
 export async function getMpesaToken() {
   const consumerKey = process.env.MPESA_CONSUMER_KEY
   const consumerSecret = process.env.MPESA_CONSUMER_SECRET
+  const isProd = process.env.MPESA_ENV === 'production'
+  const baseUrl = isProd ? 'https://api.safaricom.co.ke' : 'https://sandbox.safaricom.co.ke'
+
   if (!consumerKey || !consumerSecret) throw new Error("Missing M-PESA Consumer Keys in .env")
 
   const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64')
 
-  const response = await fetch('https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+  const response = await fetch(`${baseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
     headers: { Authorization: `Basic ${auth}` },
     cache: 'no-store'
   })
@@ -22,30 +25,31 @@ export async function initiateSTKPush(phone: string, amount: number, orderId: st
   const token = await getMpesaToken()
   const shortcode = process.env.MPESA_SHORTCODE!
   const passkey = process.env.MPESA_PASSKEY!
+  const isProd = process.env.MPESA_ENV === 'production'
+  const baseUrl = isProd ? 'https://api.safaricom.co.ke' : 'https://sandbox.safaricom.co.ke'
   
   const timestamp = new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14) 
   const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64')
 
   const formattedPhone = phone.startsWith('0') ? `254${phone.slice(1)}` : phone.replace('+', '')
 
-  // NOTE: You must update NEXTAUTH_URL perfectly in Vercel to allow Safaricom tracking payload to resolve.
-  const host = process.env.NEXTAUTH_URL || 'https://blackinkbookstore.vercel.app'
+  const host = process.env.NEXTAUTH_URL || 'https://blackinkbookstore-swart.vercel.app'
 
   const payload = {
     BusinessShortCode: shortcode,
     Password: password,
     Timestamp: timestamp,
-    TransactionType: "CustomerPayBillOnline", 
+    TransactionType: isProd ? "CustomerPayBillOnline" : "CustomerPayBillOnline", 
     Amount: Math.ceil(amount),
     PartyA: formattedPhone,
     PartyB: shortcode,
     PhoneNumber: formattedPhone,
     CallBackURL: `${host}/api/webhooks/mpesa`,
-    AccountReference: orderId,
+    AccountReference: orderId.slice(0, 12), // Safaricom limit
     TransactionDesc: "Blackink Bookstore Checkout"
   }
 
-  const response = await fetch('https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest', {
+  const response = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
