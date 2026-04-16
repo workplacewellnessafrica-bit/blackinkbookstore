@@ -9,13 +9,16 @@ export default async function EditBookPage({ params }: { params: { id: string } 
 
   if (!book) notFound()
 
+  // Convert to plain object to handle non-serializable types like Date/Decimal
+  const plainBook = JSON.parse(JSON.stringify(book))
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold text-text">Edit Book Registry</h1>
         <p className="text-sm text-muted">Updating metadata for: <span className="font-bold underline">{book.title}</span></p>
       </div>
-      <BookForm book={book} />
+      <BookForm book={plainBook} />
     </div>
   )
 }
