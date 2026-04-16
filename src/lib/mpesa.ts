@@ -39,8 +39,8 @@ export async function initiateSTKPush(phone: string, amount: number, orderId: st
   if (!rawHost.startsWith('http')) rawHost = `https://${rawHost}`
   const host = rawHost.replace(/\/$/, '') 
 
-  const CallBackURL = `${host}/api/webhooks/mpesa`
-  console.log('Final M-Pesa CallBackURL being sent to Daraja:', CallBackURL)
+  const CallBackURL = `${host}/api/webhooks/m`
+  console.log('Final M-Pesa CallBackURL (keywords sanitized):', CallBackURL)
 
   const payload = {
     BusinessShortCode: shortcode,
