@@ -36,8 +36,31 @@ model Order {
   status          OrderStatus   @default(PENDING)
   paymentMethod   PaymentMethod
   paymentRef      String?
+  checkoutRequestId String?      @unique
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+}
+
+model BlogPost {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  content   String
+  image     String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  location    String
+  content     String
+  rating      Int      @default(5)
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
 }
 
 model ShippingZone {
