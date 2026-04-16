@@ -9,6 +9,7 @@ const checkoutSchema = z.object({
   customerPhone: z.string().optional(),
   shippingAddress: z.string().min(5),
   shippingRegion: z.string(),
+  shippingProvider: z.string(),
   items: z.array(z.object({
     id: z.string(),
     quantity: z.number().min(1)
@@ -34,17 +35,21 @@ export async function POST(request: Request) {
       subtotal += book.price * item.quantity
     }
 
-    // 2. Calculate Shipping
+    // 2. Calculate Shipping natively validating the exact location + provider combination securely
     const zone = await prisma.shippingZone.findUnique({
-      where: { name: data.shippingRegion }
+      where: { 
+        name_provider: {
+            name: data.shippingRegion,
+            provider: data.shippingProvider
+        }
+      }
     })
-    if (!zone) return NextResponse.json({ error: 'Invalid shipping region' }, { status: 400 })
+    if (!zone) return NextResponse.json({ error: 'Invalid logistical route mapping.' }, { status: 400 })
 
     const total = subtotal + zone.fee
 
     // 3. Create Order natively via Transaction
     const order = await prisma.$transaction(async (tx) => {
-      // Decrement stock for ordered items
       for (const item of data.items) {
         await tx.book.update({
           where: { id: item.id },
@@ -52,7 +57,6 @@ export async function POST(request: Request) {
         })
       }
 
-      // Create tracking Order
       return tx.order.create({
         data: {
           customerName: data.customerName,
@@ -60,20 +64,17 @@ export async function POST(request: Request) {
           customerPhone: data.customerPhone,
           shippingAddress: data.shippingAddress,
           shippingRegion: data.shippingRegion,
+          shippingProvider: data.shippingProvider,
           shippingFee: zone.fee,
           subtotal,
           total,
           paymentMethod: data.paymentMethod,
           status: 'PENDING'
-          // Currently not associating order items to Order in the DB since the schema 
-          // does not have OrderItem. The PRD lists order items under "Order detail view"
-          // but the DB schema given does not actually map them. 
         }
       })
     })
 
-    // Mock sending email via Resend
-    console.log(`[Resend Mock Task] Sending receipt to ${order.customerEmail} for order ${order.id}`);
+    console.log(`[Resend Mock Task] Sending receipt to ${order.customerEmail}`);
 
     // Dispatch Daraja STK 
     if (order.paymentMethod === 'MPESA') {

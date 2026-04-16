@@ -14,6 +14,7 @@ const checkoutSchema = z.object({
   customerPhone: z.string().optional(),
   shippingAddress: z.string().min(5, "Full address is required"),
   shippingRegion: z.string().min(1, "Please select a region"),
+  shippingProvider: z.string().min(1, "Please select a provider"),
   paymentMethod: z.enum(['MPESA', 'STRIPE', 'PAYPAL'])
 })
 
@@ -26,16 +27,27 @@ export default function CheckoutPage() {
   const [zones, setZones] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<CheckoutData>({
+  const { register, handleSubmit, watch, formState: { errors }, setValue } = useForm<CheckoutData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: { paymentMethod: 'MPESA' }
   })
 
-  // Live Shipping Tracker
+  // Group zones by Location
+  const uniqueLocations = Array.from(new Set(zones.map(z => z.name)))
+
   const selectedRegionName = watch('shippingRegion')
-  const selectedZone = zones.find(z => z.name === selectedRegionName)
+  const availableProviders = zones.filter(z => z.name === selectedRegionName)
+  const selectedProviderName = watch('shippingProvider')
+
+  // Derive Fee
+  const selectedZone = availableProviders.find(z => z.provider === selectedProviderName)
   const shippingFee = selectedZone ? selectedZone.fee : 0
   const total = cartTotal() + shippingFee
+
+  // Automatically deselect provider if region changes
+  useEffect(() => {
+    setValue('shippingProvider', '')
+  }, [selectedRegionName, setValue])
 
   useEffect(() => {
     setMounted(true)
@@ -63,7 +75,7 @@ export default function CheckoutPage() {
       
       if (response.ok && result.orderId) {
         clearCart()
-        alert(`Order ${result.orderId} placed successfully! Sending receipt to ${data.customerEmail}.`)
+        alert(`Order ${result.orderId} placed successfully! Processing Payment via ${data.paymentMethod}.`)
         router.push(`/books`) 
       } else {
         alert(result.error || 'Failed to process checkout')
@@ -101,24 +113,45 @@ export default function CheckoutPage() {
             </div>
 
             <div className="pt-2">
-              <h2 className="text-xl font-bold mb-4 mt-8">Shipping Address</h2>
+              <h2 className="text-xl font-bold mb-4 mt-8">Delivery Logistics</h2>
               <div className="space-y-4">
                 <div>
                   <Input placeholder="Street Address, Building, Apartment" {...register('shippingAddress')} />
                   {errors.shippingAddress && <p className="text-error text-xs mt-1">{errors.shippingAddress.message}</p>}
                 </div>
+                
+                {/* Tier 1: Select Region */}
                 <div>
                   <select 
                     {...register('shippingRegion')}
                     className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                   >
-                    <option value="">Select Region</option>
-                    {zones.map(zone => (
-                      <option key={zone.id} value={zone.name}>{zone.name} (+ KES {zone.fee})</option>
+                    <option value="">Select Destination Region</option>
+                    {uniqueLocations.map(location => (
+                      <option key={location} value={location}>{location}</option>
                     ))}
                   </select>
                   {errors.shippingRegion && <p className="text-error text-xs mt-1">{errors.shippingRegion.message}</p>}
                 </div>
+
+                {/* Tier 2: Select Provider depending on Region */}
+                {selectedRegionName && availableProviders.length > 0 && (
+                  <div className="p-4 bg-black/5 rounded-md space-y-3">
+                    <p className="font-semibold text-sm">Select Default Carrier for {selectedRegionName}</p>
+                    <div className="grid gap-3">
+                      {availableProviders.map(providerZone => (
+                         <label key={providerZone.id} className="flex items-center gap-3 cursor-pointer p-3 border border-border rounded bg-white hover:border-black transition-colors">
+                           <input type="radio" value={providerZone.provider} {...register('shippingProvider')} className="accent-text" />
+                           <div className="flex-1 flex justify-between">
+                              <span className="font-semibold text-sm">{providerZone.provider}</span>
+                              <span className="font-mono font-medium text-sm">+ KES {providerZone.fee}</span>
+                           </div>
+                         </label>
+                      ))}
+                    </div>
+                    {errors.shippingProvider && <p className="text-error text-xs mt-1">Please select an available fulfillment carrier.</p>}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -144,7 +177,7 @@ export default function CheckoutPage() {
         
         <div className="w-full lg:w-1/2">
           <div className="bg-border/20 p-6 rounded-md sticky top-24">
-            <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+            <h2 className="text-xl font-bold mb-6">Order Breakdown</h2>
             <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
               {items.map(item => (
                 <div key={item.id} className="flex justify-between items-center text-sm">
@@ -159,15 +192,15 @@ export default function CheckoutPage() {
             
             <div className="border-t border-border pt-4 space-y-2">
               <div className="flex justify-between text-sm text-muted">
-                <span>Subtotal</span>
+                <span>Books Subtotal</span>
                 <span className="font-mono">KES {cartTotal().toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm text-muted">
-                <span>Shipping</span>
+                <span>Shipping ({selectedProviderName || '...'})</span>
                 <span className="font-mono text-text">{shippingFee > 0 ? `KES ${shippingFee.toLocaleString()}` : '--'}</span>
               </div>
               <div className="flex justify-between text-lg font-bold pt-2 mt-2 border-t border-dashed border-border text-text">
-                <span>Total</span>
+                <span>Final Total Calculation</span>
                 <span className="font-mono">KES {total.toLocaleString()}</span>
               </div>
             </div>

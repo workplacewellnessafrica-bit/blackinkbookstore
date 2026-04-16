@@ -27,9 +27,10 @@ model Order {
   customerName    String
   customerEmail   String
   customerPhone   String?
-  shippingAddress String
-  shippingRegion  String
-  shippingFee     Float
+  shippingAddress  String
+  shippingRegion   String
+  shippingProvider String        @default("Standard")
+  shippingFee      Float
   subtotal        Float
   total           Float
   status          OrderStatus   @default(PENDING)
@@ -40,9 +41,12 @@ model Order {
 }
 
 model ShippingZone {
-  id      String @id @default(cuid())
-  name    String @unique
-  fee     Float
+  id       String @id @default(cuid())
+  name     String
+  provider String @default("Standard")
+  fee      Float
+
+  @@unique([name, provider])
 }
 
 enum OrderStatus {
