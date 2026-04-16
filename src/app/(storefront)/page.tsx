@@ -15,25 +15,25 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="relative bg-background py-40 sm:py-56 flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+      <section className="relative py-40 sm:py-56 flex flex-col items-center justify-center text-center px-4 overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-black">
           <Image 
             src="/images/IMG-20260416-WA0060.jpg" 
             alt="Hero Background Image" 
             fill 
-            className="object-cover opacity-60" 
+            className="object-cover opacity-50" 
             priority
           />
         </div>
-        <div className="relative z-10 bg-background/80 backdrop-blur px-8 py-6 rounded-md">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-text max-w-4xl mb-4">
+        <div className="relative z-10 bg-white/10 backdrop-blur-md border border-white/20 px-10 py-8 rounded-2xl shadow-2xl transition-all hover:bg-white/15">
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white max-w-4xl mb-4 drop-shadow-lg">
             BLACKINK BOOKSTORE.
           </h1>
-          <p className="text-base text-muted max-w-2xl mb-8">
+          <p className="text-lg text-white/90 max-w-2xl mb-8 font-medium drop-shadow-md">
             Discover a minimalist collection of essential literature.
           </p>
           <Link href="/books">
-            <Button size="lg" className="rounded-full shadow-lg font-semibold tracking-wide">Shop the Catalogue</Button>
+            <Button size="lg" className="rounded-full bg-white text-black hover:bg-white/90 shadow-xl font-bold px-8 py-6 transition-transform hover:scale-105 active:scale-95">Shop the Catalogue</Button>
           </Link>
         </div>
       </section>
