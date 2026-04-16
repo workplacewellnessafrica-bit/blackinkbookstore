@@ -1,0 +1,83 @@
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { z } from 'zod'
+
+const checkoutSchema = z.object({
+  customerName: z.string().min(2),
+  customerEmail: z.string().email(),
+  customerPhone: z.string().optional(),
+  shippingAddress: z.string().min(5),
+  shippingRegion: z.string(),
+  items: z.array(z.object({
+    id: z.string(),
+    quantity: z.number().min(1)
+  })).min(1),
+  paymentMethod: z.enum(['MPESA', 'STRIPE', 'PAYPAL'])
+})
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const data = checkoutSchema.parse(body)
+    
+    // 1. Fetch real prices and validate stock
+    const dbBooks = await prisma.book.findMany({
+      where: { id: { in: data.items.map(i => i.id) } }
+    })
+    
+    let subtotal = 0
+    for (const item of data.items) {
+      const book = dbBooks.find(b => b.id === item.id)
+      if (!book) return NextResponse.json({ error: `Book ${item.id} not found` }, { status: 400 })
+      if (book.stock < item.quantity) return NextResponse.json({ error: `Not enough stock for ${book.title}` }, { status: 400 })
+      subtotal += book.price * item.quantity
+    }
+
+    // 2. Calculate Shipping
+    const zone = await prisma.shippingZone.findUnique({
+      where: { name: data.shippingRegion }
+    })
+    if (!zone) return NextResponse.json({ error: 'Invalid shipping region' }, { status: 400 })
+
+    const total = subtotal + zone.fee
+
+    // 3. Create Order natively via Transaction
+    const order = await prisma.$transaction(async (tx) => {
+      // Decrement stock for ordered items
+      for (const item of data.items) {
+        await tx.book.update({
+          where: { id: item.id },
+          data: { stock: { decrement: item.quantity } }
+        })
+      }
+
+      // Create tracking Order
+      return tx.order.create({
+        data: {
+          customerName: data.customerName,
+          customerEmail: data.customerEmail,
+          customerPhone: data.customerPhone,
+          shippingAddress: data.shippingAddress,
+          shippingRegion: data.shippingRegion,
+          shippingFee: zone.fee,
+          subtotal,
+          total,
+          paymentMethod: data.paymentMethod,
+          status: 'PENDING'
+          // Currently not associating order items to Order in the DB since the schema 
+          // does not have OrderItem. The PRD lists order items under "Order detail view"
+          // but the DB schema given does not actually map them. 
+        }
+      })
+    })
+
+    // Mock sending email via Resend
+    console.log(`[Resend Mock Task] Sending receipt to ${order.customerEmail} for order ${order.id}`);
+
+    return NextResponse.json({ success: true, orderId: order.id })
+
+  } catch (error) {
+    console.error('Checkout error:', error)
+    return NextResponse.json({ error: 'Checkout failed' }, { status: 400 })
+  }
+}
