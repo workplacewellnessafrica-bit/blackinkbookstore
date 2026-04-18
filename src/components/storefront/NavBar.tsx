@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Search, ChevronDown, X } from 'lucide-react'
+import { ShoppingCart, Search, ChevronDown, X, Menu } from 'lucide-react'
 import { useCartStore } from '@/store/cart'
 import { Input } from '@/components/ui/input'
 import Image from 'next/image'
@@ -15,6 +15,7 @@ const CATALOGUE_BRANCHES = {
 export function NavBar() {
   const [mounted, setMounted] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   
   const items = useCartStore((state) => state.items)
@@ -28,28 +29,36 @@ export function NavBar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white/95 backdrop-blur shadow-sm">
       <div className="container mx-auto max-w-7xl px-4 h-20 flex items-center justify-between">
         
-        {/* Brand Identity */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 overflow-hidden rounded-full border border-black/5 bg-black/5 transition-transform group-hover:scale-110">
-            <Image src="/logo.png" alt="Logo" fill className="object-cover" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-sans font-black text-lg leading-tight tracking-tighter text-black uppercase">
-              Black Ink
-            </span>
-            <span className="font-sans text-[10px] font-bold tracking-[0.2em] text-muted uppercase leading-none -mt-0.5">
-              Bookstores
-            </span>
-          </div>
-        </Link>
+        {/* Left Side: Brand + Mobile Menu Trigger */}
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 lg:hidden hover:bg-black/5 rounded-full transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
 
-        {/* Global Navigation */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 overflow-hidden rounded-full border border-black/5 bg-black/5 transition-transform group-hover:scale-110">
+              <Image src="/logo.png" alt="Logo" fill className="object-cover" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-sans font-black text-lg leading-tight tracking-tighter text-black uppercase">
+                Black Ink
+              </span>
+              <span className="font-sans text-[10px] font-bold tracking-[0.2em] text-muted uppercase leading-none -mt-0.5">
+                Bookstores
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 ml-8">
           <Link href="/" className="text-xs font-bold uppercase tracking-widest text-muted hover:text-black transition-colors">
             Home
           </Link>
           
-          {/* Mega Menu Trigger */}
           <div 
             className="relative group py-4"
             onMouseEnter={() => setActiveMenu('catalogue')}
@@ -59,7 +68,6 @@ export function NavBar() {
               Catalogue <ChevronDown className="w-3 h-3 group-hover:rotate-180 transition-transform" />
             </button>
             
-            {/* Dropdown Menu */}
             <div className={`absolute top-full -left-20 w-[600px] bg-white border border-border rounded-xl shadow-2xl p-8 grid grid-cols-3 gap-8 transition-all duration-300 origin-top overflow-hidden
               ${activeMenu === 'catalogue' ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
               {Object.entries(CATALOGUE_BRANCHES).map(([branch, sub]) => (
@@ -97,9 +105,8 @@ export function NavBar() {
           </Link>
         </nav>
 
-        {/* Interactive Actions */}
-        <div className="flex items-center gap-6">
-          {/* Search Dropdown */}
+        {/* Right Side: Search + Cart */}
+        <div className="flex items-center gap-2 sm:gap-6">
           <div className="relative">
             <button 
               onClick={() => setSearchOpen(!searchOpen)} 
@@ -108,7 +115,7 @@ export function NavBar() {
               {searchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
             </button>
             
-            <div className={`absolute top-full right-0 mt-4 w-72 bg-white border border-border rounded-lg shadow-xl p-4 transition-all duration-200 origin-top-right
+            <div className={`absolute top-full right-0 mt-4 w-[280px] sm:w-72 bg-white border border-border rounded-lg shadow-xl p-4 transition-all duration-200 origin-top-right
               ${searchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`}>
               <form action="/books" method="GET" className="relative">
                 <Input name="q" placeholder="Theology, Romance..." className="pr-10 text-xs h-10 border-none bg-black/5" />
@@ -119,7 +126,6 @@ export function NavBar() {
             </div>
           </div>
 
-          {/* Cart Action */}
           <Link href="/cart" className="relative p-2 hover:bg-black/5 rounded-full transition-colors group">
             <ShoppingCart className="w-5 h-5" />
             {mounted && count > 0 && (
@@ -128,6 +134,57 @@ export function NavBar() {
               </span>
             )}
           </Link>
+        </div>
+      </div>
+
+      {/* Mobile Menu Drawer */}
+      <div className={`fixed inset-0 z-[60] bg-black/50 transition-opacity lg:hidden ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className={`absolute top-0 left-0 h-full w-[85%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <div className="flex flex-col h-full">
+            <div className="p-6 flex items-center justify-between border-b border-border">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Navigation</span>
+              <button onClick={() => setMobileMenuOpen(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              <nav className="flex flex-col gap-6">
+                <Link onClick={() => setMobileMenuOpen(false)} href="/" className="text-lg font-black uppercase tracking-tighter text-black">Home</Link>
+                
+                <div className="space-y-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">Catalogue</span>
+                  <div className="grid grid-cols-1 gap-4 pl-4 border-l border-border">
+                    {Object.entries(CATALOGUE_BRANCHES).map(([branch, sub]) => (
+                      <div key={branch} className="space-y-2">
+                        <span className="text-[9px] font-black uppercase tracking-[0.1em] text-black underline decoration-black/10 underline-offset-4">{branch}</span>
+                        <div className="flex flex-wrap gap-2">
+                          {sub.map(cat => (
+                            <Link 
+                              key={cat}
+                              onClick={() => setMobileMenuOpen(false)}
+                              href={`/books?genre=${cat}`}
+                              className="text-xs font-bold text-muted bg-black/5 px-2 py-1 rounded"
+                            >
+                              {cat}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Link onClick={() => setMobileMenuOpen(false)} href="/blog" className="text-lg font-black uppercase tracking-tighter text-black">Blog</Link>
+                <Link onClick={() => setMobileMenuOpen(false)} href="/about" className="text-lg font-black uppercase tracking-tighter text-black">About</Link>
+                <Link onClick={() => setMobileMenuOpen(false)} href="/contact" className="text-lg font-black uppercase tracking-tighter text-black">Contact Us</Link>
+              </nav>
+            </div>
+
+            <div className="p-6 border-t border-border bg-black/5">
+               <p className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 text-center">Black Ink Bookstores</p>
+            </div>
+          </div>
         </div>
       </div>
     </header>
