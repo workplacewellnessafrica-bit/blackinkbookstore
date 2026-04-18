@@ -86,7 +86,7 @@ export function NavBar() {
             </div>
           </div>
 
-          <Link href="/cart" className="relative p-2 hover:bg-black/5 rounded-full transition-colors group">
+          <Link href="/library" className="relative p-2 hover:bg-black/5 rounded-full transition-colors group">
             <ShoppingCart className="w-5 h-5" />
             {mounted && count > 0 && (
               <span className="absolute -top-1 -right-1 bg-black text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-white scale-110">

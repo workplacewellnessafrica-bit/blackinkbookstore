@@ -58,7 +58,7 @@ export default function CheckoutPage() {
   }, [])
 
   if (!mounted) return null
-  if (items.length === 0) return <div className="p-20 text-center text-muted">Your cart is empty. Please add items.</div>
+  if (items.length === 0) return <div className="p-20 text-center text-muted uppercase text-[10px] font-black tracking-widest">Your library is empty. Please select works to proceed.</div>
 
   const onSubmit = async (data: CheckoutData) => {
     setLoading(true)
