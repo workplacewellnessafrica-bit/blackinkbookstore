@@ -17,11 +17,6 @@ export default async function CataloguePage() {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-12 min-h-screen font-serif">
-      <header className="mb-12 space-y-2">
-        <h1 className="text-4xl font-black uppercase tracking-tighter italic">Library Catalogue</h1>
-        <p className="text-[10px] font-bold text-muted uppercase tracking-[0.4em]">Black Ink Bookstores</p>
-      </header>
-      
       <CatalogueClient books={books} sections={SECTIONS} />
     </div>
   )

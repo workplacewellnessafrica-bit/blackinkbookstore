@@ -33,11 +33,7 @@ export function CatalogueClient({ books, sections }: Props) {
 
   return (
     <div className="space-y-12">
-      {/* Design-borrowed Note */}
-      <div className="bg-black/5 border-l-2 border-black p-6 text-xs text-muted leading-relaxed uppercase tracking-widest font-sans">
-        New books are standard stock. Thrift choices are curated pre-loved works.
-        <br />Select by section or condition preference.
-      </div>
+
 
       {/* Filter Area */}
       <div className="space-y-10 group">
