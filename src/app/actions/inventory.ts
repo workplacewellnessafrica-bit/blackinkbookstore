@@ -31,13 +31,28 @@ export async function upsertBook(formData: FormData) {
   const author = formData.get('author') as string
   const genre = formData.get('genre') as string
   const description = formData.get('description') as string
-  const price = parseFloat(formData.get('price') as string)
-  const originalPrice = formData.get('originalPrice') ? parseFloat(formData.get('originalPrice') as string) : null
-  const stock = parseInt(formData.get('stock') as string)
-  const weight = parseFloat(formData.get('weight') as string || "0.5")
-  const sku = formData.get('sku') as string
+  
+  // Sanitize numeric inputs to avoid NaN
+  const priceStr = formData.get('price') as string
+  const price = parseFloat(priceStr) || 0
+  
+  const originalPriceStr = formData.get('originalPrice') as string
+  const originalPrice = (originalPriceStr && !isNaN(parseFloat(originalPriceStr))) ? parseFloat(originalPriceStr) : null
+  
+  const stockStr = formData.get('stock') as string
+  const stock = parseInt(stockStr) || 0
+  
+  const weightStr = formData.get('weight') as string
+  const weight = (weightStr && !isNaN(parseFloat(weightStr))) ? parseFloat(weightStr) : 0.5
+  
+  // Handle unique fields: Empty strings should be null to avoid P2002 unique constraint errors
+  const skuRaw = formData.get('sku') as string
+  const sku = skuRaw?.trim() === "" ? null : skuRaw
+
+  const isbnRaw = formData.get('isbn') as string
+  const isbn = isbnRaw?.trim() === "" ? null : isbnRaw
+
   const format = formData.get('format') as string
-  const isbn = formData.get('isbn') as string
   const isThrift = formData.get('isThrift') === 'on'
   
   const imageFile = formData.get('coverImage') as File | null
