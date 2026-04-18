@@ -8,18 +8,23 @@ datasource db {
 }
 
 model Book {
-  id          String   @id @default(cuid())
-  title       String
-  author      String
-  description String?
-  price       Float
-  coverImage  String?
-  isbn        String?  @unique
-  genre       String?
-  stock       Int      @default(0)
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  author        String
+  description   String?
+  price         Float
+  originalPrice Float?
+  weight        Float    @default(0.5)
+  sku           String?  @unique
+  format        String?
+  coverImage    String?
+  isbn          String?  @unique
+  genre         String?
+  stock         Int      @default(0)
+  featured      Boolean  @default(false)
+  isThrift      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Order {

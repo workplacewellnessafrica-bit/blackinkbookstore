@@ -28,11 +28,13 @@ export async function POST(request: Request) {
     })
     
     let subtotal = 0
+    let totalWeight = 0
     for (const item of data.items) {
       const book = dbBooks.find(b => b.id === item.id)
       if (!book) return NextResponse.json({ error: `Book ${item.id} not found` }, { status: 400 })
       if (book.stock < item.quantity) return NextResponse.json({ error: `Not enough stock for ${book.title}` }, { status: 400 })
       subtotal += book.price * item.quantity
+      totalWeight += (book.weight || 0.5) * item.quantity
     }
 
     // 2. Calculate Shipping natively validating the exact location + provider combination securely
@@ -46,7 +48,12 @@ export async function POST(request: Request) {
     })
     if (!zone) return NextResponse.json({ error: 'Invalid logistical route mapping.' }, { status: 400 })
 
-    const total = subtotal + zone.fee
+    // Surcharge logic: +60 KES for every kg above 5kg (rounded to nearest kg)
+    const roundedWeight = Math.round(totalWeight)
+    const extraWeight = Math.max(0, roundedWeight - 5)
+    const shippingFee = zone.fee + (extraWeight * 60)
+
+    const total = subtotal + shippingFee
 
     // 3. Create Order natively via Transaction
     const order = await prisma.$transaction(async (tx) => {
@@ -65,7 +72,7 @@ export async function POST(request: Request) {
           shippingAddress: data.shippingAddress,
           shippingRegion: data.shippingRegion,
           shippingProvider: data.shippingProvider,
-          shippingFee: zone.fee,
+          shippingFee: shippingFee,
           subtotal,
           total,
           paymentMethod: data.paymentMethod,

@@ -13,45 +13,53 @@ export default function CartPage() {
 
   if (!mounted) return null
 
+  const totalWeight = items.reduce((acc, item) => acc + (item.weight || 0.5) * item.quantity, 0)
+
   if (items.length === 0) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-24 text-center">
-        <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
-        <p className="text-muted mb-8">Looks like you haven't added any books yet.</p>
-        <Link href="/books">
-          <Button size="lg">Continue Shopping</Button>
+      <div className="container mx-auto max-w-7xl px-4 py-32 text-center space-y-8">
+        <h1 className="text-5xl font-black uppercase tracking-tighter italic">The Bag is Empty</h1>
+        <p className="text-xs font-bold text-muted uppercase tracking-[0.3em]">Your library awaits its first addition.</p>
+        <Link href="/catalogue" className="inline-block">
+          <Button variant="outline" className="rounded-none border-black px-12 py-6 font-black uppercase tracking-widest">Browse Catalogue</Button>
         </Link>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-16">
-      <h1 className="text-4xl font-bold text-text mb-10 tracking-tight">Your Cart</h1>
+    <div className="container mx-auto max-w-7xl px-4 py-20 min-h-screen font-serif">
+      <h1 className="text-4xl font-black uppercase tracking-tighter italic mb-12">Your Selections</h1>
       
-      <div className="flex flex-col lg:flex-row gap-12">
-        <div className="w-full lg:w-2/3">
+      <div className="flex flex-col lg:flex-row gap-20">
+        <div className="w-full lg:w-[60%] space-y-12">
           {items.map((item) => (
-            <div key={item.id} className="flex gap-6 py-6 border-b border-border">
-              <div className="w-24 h-36 relative rounded overflow-hidden bg-border/20 flex-shrink-0">
+            <div key={item.id} className="flex gap-8 group">
+              <div className="w-32 h-44 relative overflow-hidden bg-black/5 flex-shrink-0">
                 {item.coverImage && (
-                  <Image src={item.coverImage} alt={item.title} fill className="object-cover" sizes="96px" />
+                  <Image src={item.coverImage} alt={item.title} fill className="object-cover" sizes="128px" />
                 )}
               </div>
-              <div className="flex-1 flex flex-col justify-between py-2">
-                <div>
-                  <h3 className="text-lg font-bold line-clamp-1">{item.title}</h3>
-                  <p className="text-muted text-sm mb-2">{item.author}</p>
-                  <p className="font-mono text-sm font-semibold">KES {item.price.toLocaleString()}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-border rounded-md">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-3 py-1 text-lg hover:bg-black/5">-</button>
-                    <span className="px-2 text-sm font-medium w-6 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-3 py-1 text-lg hover:bg-black/5">+</button>
+              <div className="flex-1 flex flex-col justify-between py-1">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start gap-4">
+                    <h3 className="text-lg font-black uppercase tracking-tight leading-none group-hover:underline">{item.title}</h3>
+                    <p className="font-sans text-sm font-black whitespace-nowrap">KES {item.price.toLocaleString()}</p>
                   </div>
-                  <button onClick={() => removeItem(item.id)} className="text-sm font-semibold text-error hover:underline md:ml-4">
-                    Remove
+                  <p className="text-[10px] font-bold text-muted uppercase tracking-widest">{item.author} — {item.format || 'Standard Edition'}</p>
+                  <p className="text-[10px] leading-relaxed text-muted line-clamp-2 uppercase tracking-wide opacity-80">
+                    {item.description || "No description available."}
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between pt-4">
+                  <div className="flex items-center border border-black/10">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-4 py-2 text-sm hover:bg-black/5 transition-colors">-</button>
+                    <span className="px-4 text-[10px] font-black w-10 text-center">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-4 py-2 text-sm hover:bg-black/5 transition-colors">+</button>
+                  </div>
+                  <button onClick={() => removeItem(item.id)} className="text-[9px] font-black uppercase tracking-[0.2em] text-error hover:underline opacity-60 hover:opacity-100 transition-all">
+                    Remove from Library
                   </button>
                 </div>
               </div>
@@ -59,16 +67,35 @@ export default function CartPage() {
           ))}
         </div>
         
-        <div className="w-full lg:w-1/3">
-          <div className="bg-border/20 p-6 rounded-md sticky top-24">
-            <h2 className="text-lg font-bold mb-4">Order Summary</h2>
-            <div className="flex justify-between mb-2">
-              <span className="text-muted">Subtotal</span>
-              <span className="font-mono font-semibold text-text">KES {cartTotal().toLocaleString()}</span>
+        <div className="w-full lg:w-[40%]">
+          <div className="bg-black text-white p-10 space-y-10 sticky top-32">
+            <h2 className="text-xl font-black uppercase tracking-[0.2em] border-b border-white/10 pb-4">Order Summary</h2>
+            
+            <div className="space-y-6">
+              <div className="flex justify-between items-end">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Subtotal</span>
+                <span className="text-lg font-black tracking-tight">KES {cartTotal().toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-end">
+                <div className="space-y-1">
+                   <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Total Weight</span>
+                   <p className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Nearest KG: {Math.round(totalWeight)} KG</p>
+                </div>
+                <span className="text-xs font-black uppercase tracking-widest">{totalWeight.toFixed(2)} KG</span>
+              </div>
             </div>
-            <p className="text-xs text-muted mb-6">Shipping is calculated at checkout.</p>
+
+            <div className="bg-white/5 p-4 space-y-2">
+               <p className="text-[10px] font-black uppercase tracking-widest">Logistics Note:</p>
+               <p className="text-[9px] leading-relaxed text-white/60 uppercase tracking-wide">
+                 Shipping is calculated based on region. Orders over 5 KG attract an additional 60 KES / KG surcharge (rounded to the nearest KG).
+               </p>
+            </div>
+
             <Link href="/checkout" className="block w-full">
-              <Button size="lg" className="w-full">Proceed to Checkout</Button>
+              <Button className="w-full rounded-none bg-white text-black hover:bg-white/90 font-black uppercase tracking-[0.4em] py-8 text-xs border-none">
+                Proceed to Checkout
+              </Button>
             </Link>
           </div>
         </div>

@@ -10,7 +10,7 @@ export async function deleteBook(id: string) {
   if (!session) throw new Error("Unauthorized")
   await prisma.book.delete({ where: { id } })
   revalidatePath('/owner/inventory')
-  revalidatePath('/books')
+  revalidatePath('/catalogue')
 }
 
 export async function updateStock(id: string, newStock: number) {
@@ -18,6 +18,7 @@ export async function updateStock(id: string, newStock: number) {
   if (!session) throw new Error("Unauthorized")
   await prisma.book.update({ where: { id }, data: { stock: newStock } })
   revalidatePath('/owner/inventory')
+  revalidatePath('/catalogue')
   revalidatePath(`/books/${id}`)
 }
 
@@ -31,8 +32,13 @@ export async function upsertBook(formData: FormData) {
   const genre = formData.get('genre') as string
   const description = formData.get('description') as string
   const price = parseFloat(formData.get('price') as string)
+  const originalPrice = formData.get('originalPrice') ? parseFloat(formData.get('originalPrice') as string) : null
   const stock = parseInt(formData.get('stock') as string)
+  const weight = parseFloat(formData.get('weight') as string || "0.5")
+  const sku = formData.get('sku') as string
+  const format = formData.get('format') as string
   const isbn = formData.get('isbn') as string
+  const isThrift = formData.get('isThrift') === 'on'
   
   const imageFile = formData.get('coverImage') as File | null
 
@@ -49,8 +55,12 @@ export async function upsertBook(formData: FormData) {
     genre,
     description,
     price,
-    stock,
+    originalPrice,
+    weight,
+    sku,
+    format,
     isbn,
+    isThrift,
     coverImage: coverImageUrl,
   }
 
@@ -61,6 +71,6 @@ export async function upsertBook(formData: FormData) {
   }
 
   revalidatePath('/owner/inventory')
-  revalidatePath('/books')
+  revalidatePath('/catalogue')
   if (id) revalidatePath(`/books/${id}`)
 }
