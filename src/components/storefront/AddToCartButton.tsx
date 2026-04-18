@@ -13,7 +13,11 @@ export function AddToCartButton({ book }: { book: any }) {
       title: book.title,
       price: book.price,
       coverImage: book.coverImage,
-      author: book.author
+      author: book.author,
+      weight: book.weight,
+      format: book.format,
+      description: book.description,
+      isThrift: book.isThrift
     })
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)

@@ -8,6 +8,10 @@ export interface CartItem {
   coverImage: string | null
   author: string
   quantity: number
+  weight?: number
+  format?: string
+  description?: string
+  isThrift?: boolean
 }
 
 interface CartStore {
