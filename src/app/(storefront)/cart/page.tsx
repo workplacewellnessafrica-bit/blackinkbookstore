@@ -18,8 +18,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-32 text-center space-y-8">
-        <h1 className="text-5xl font-black uppercase tracking-tighter italic">The Library is Empty</h1>
-        <p className="text-xs font-bold text-muted uppercase tracking-[0.3em]">Your library awaits its first addition.</p>
+        <h1 className="text-5xl font-black uppercase tracking-tighter italic">Your Cart is Empty</h1>        <p className="text-xs font-bold text-muted uppercase tracking-[0.3em]">Your library awaits its first addition.</p>
         <Link href="/catalogue" className="inline-block">
           <Button variant="outline" className="rounded-none border-black px-12 py-6 font-black uppercase tracking-widest">Browse Catalogue</Button>
         </Link>
@@ -59,7 +58,7 @@ export default function CartPage() {
                     <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-4 py-2 text-sm hover:bg-black/5 transition-colors">+</button>
                   </div>
                   <button onClick={() => removeItem(item.id)} className="text-[9px] font-black uppercase tracking-[0.2em] text-error hover:underline opacity-60 hover:opacity-100 transition-all">
-                    Remove Item
+                    Remove from Cart
                   </button>
                 </div>
               </div>

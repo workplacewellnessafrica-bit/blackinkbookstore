@@ -30,7 +30,7 @@ export function AddToCartButton({ book }: { book: any }) {
       disabled={book.stock <= 0}
       className={added ? 'bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto' : 'w-full sm:w-auto'}
     >
-      {book.stock <= 0 ? 'Out of Stock' : added ? 'Added to Library ✓' : 'Add to Library'}
+      {book.stock <= 0 ? 'Out of Stock' : added ? 'Added to Cart ✓' : 'Add to Cart'}
     </Button>
   )
 }
