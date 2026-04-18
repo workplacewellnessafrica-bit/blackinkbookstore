@@ -22,6 +22,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
           <Link href="/owner/orders" className="block px-4 py-2.5 rounded-md text-muted hover:bg-black/5 hover:text-text transition-colors">Orders Log</Link>
           <Link href="/owner/inventory" className="block px-4 py-2.5 rounded-md text-muted hover:bg-black/5 hover:text-text transition-colors">Book Inventory</Link>
           <Link href="/owner/shipping" className="block px-4 py-2.5 rounded-md text-muted hover:bg-black/5 hover:text-text transition-colors">Shipping Matrix</Link>
+          <Link href="/owner/content" className="block px-4 py-2.5 rounded-md text-muted hover:bg-black/5 hover:text-text transition-colors">Page Content</Link>
         </nav>
         <div className="p-6 border-t border-border">
           <div className="flex items-center gap-3 mb-4">

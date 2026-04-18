@@ -6,8 +6,11 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
 
 export const metadata: Metadata = {
-  title: "Blackink Bookstore",
+  title: "Black Ink Bookstores",
   description: "A minimalist, image-forward e-commerce platform for selling books online.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

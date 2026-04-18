@@ -22,31 +22,22 @@ export function NavBar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white/95 backdrop-blur shadow-sm">
       <div className="container mx-auto max-w-7xl px-4 h-20 flex items-center justify-between">
         
-        {/* Left Side: Brand + Mobile Menu Trigger */}
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setMobileMenuOpen(true)}
-            className="p-2 lg:hidden hover:bg-black/5 rounded-full transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+        {/* Left Side: Brand (Fixed on Left) */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 overflow-hidden rounded-full border border-black/5 bg-black/5 transition-transform group-hover:scale-110">
+            <Image src="/logo.png" alt="Logo" fill className="object-cover" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-sans font-black text-lg leading-tight tracking-tighter text-black uppercase">
+              Black Ink
+            </span>
+            <span className="font-sans text-[10px] font-bold tracking-[0.2em] text-muted uppercase leading-none -mt-0.5">
+              Bookstores
+            </span>
+          </div>
+        </Link>
 
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 overflow-hidden rounded-full border border-black/5 bg-black/5 transition-transform group-hover:scale-110">
-              <Image src="/logo.png" alt="Logo" fill className="object-cover" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-sans font-black text-lg leading-tight tracking-tighter text-black uppercase">
-                Black Ink
-              </span>
-              <span className="font-sans text-[10px] font-bold tracking-[0.2em] text-muted uppercase leading-none -mt-0.5">
-                Bookstores
-              </span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Desktop Navigation - Simplified per user request */}
+        {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-8 ml-8">
           <Link href="/" className="text-xs font-bold uppercase tracking-widest text-muted hover:text-black transition-colors">
             Home
@@ -65,8 +56,8 @@ export function NavBar() {
           </Link>
         </nav>
 
-        {/* Right Side: Search + Cart */}
-        <div className="flex items-center gap-2 sm:gap-6">
+        {/* Right Side: Search + Cart + Mobile Toggle (Fixed on Right) */}
+        <div className="flex items-center gap-1 sm:gap-6">
           <div className="relative">
             <button 
               onClick={() => setSearchOpen(!searchOpen)} 
@@ -78,7 +69,7 @@ export function NavBar() {
             <div className={`absolute top-full right-0 mt-4 w-[280px] sm:w-72 bg-white border border-border rounded-lg shadow-xl p-4 transition-all duration-200 origin-top-right
               ${searchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`}>
               <form action="/catalogue" method="GET" className="relative">
-                <Input name="q" placeholder="Search the library..." className="pr-10 text-xs h-10 border-none bg-black/5" />
+                <Input name="q" placeholder="Search the library..." className="pr-10 text-xs h-10 border-none bg-black/5 font-sans" />
                 <button type="submit" className="absolute right-3 top-2.5 text-muted hover:text-black">
                   <Search className="w-4 h-4" />
                 </button>
@@ -94,12 +85,20 @@ export function NavBar() {
               </span>
             )}
           </Link>
+
+          {/* Mobile Menu Trigger (Now on the Right) */}
+          <button 
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 lg:hidden hover:bg-black/5 rounded-full transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
       </div>
 
-      {/* Mobile Menu Drawer - Simplified */}
+      {/* Mobile Menu Drawer (Slide from Right) */}
       <div className={`fixed inset-0 z-[60] bg-black/50 transition-opacity lg:hidden ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div className={`absolute top-0 left-0 h-full w-[85%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`absolute top-0 right-0 h-full w-[85%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
           <div className="flex flex-col h-full">
             <div className="p-6 flex items-center justify-between border-b border-border">
               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">Menu</span>
